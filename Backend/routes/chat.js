@@ -1,5 +1,6 @@
 import express from 'express';
 import Thread from '../models/Thread.js';
+import getOpenAIAPITResponse from '../utils/openai.js';
 
 const router = express.Router();
 
@@ -74,5 +75,44 @@ router.delete("/thread/:threadId",async(req,res)=>{
         res.status(500).send("Failed to delete thread");
     }
 });
+
+router.post("/chat",async(req,res)=>{
+    const {threadId,message}=req.body;
+    if(!threadId || !message)
+    {
+        return res.status(400).send("ThreadId and message are required");
+    }
+    try
+    {
+        const thread=await Thread.findOneAndUpdate({threadId});
+
+        if(!thread)
+        {
+            //create new thread
+            thread=new Thread({
+                threadId,
+                title:message,
+                messages:[{role:"user",content:message}],
+                // createdAt:Date.now()
+            })
+        }
+        else
+        {
+            thread.messages.push({role:"user",content:message});
+        }
+
+        const assistantReply=await getOpenAIAPITResponse(message);
+
+        thread.messages.push({role:"assistant",content:assistantReply});
+        thread.updatedAt=Date.now();
+        await thread.save();
+        res.json({reply:assistantReply});
+    }
+    catch(error)
+    {
+        console.log(error);
+        res.status(500).send("Something went wrong while processing the request");
+    }
+})
 
 export default router;
