@@ -36,6 +36,42 @@
     cursor:pointer;
 }
 
+.auth-buttons {
+    display: flex;
+    gap: 12px;
+    margin: 1rem 2rem;
+}
+
+.auth-buttons .login-btn {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.auth-buttons .login-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-buttons .signup-btn {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.auth-buttons .signup-btn:hover {
+    background: #e5e5e5;
+}
+
 /* chat Input */
 
 .chatInput{
@@ -109,6 +145,19 @@ input:focus{
     text-align: left;
     z-index: 1000;
     box-shadow:0px 2px 8px rgba(0,0,0,0.1);
+}
+
+.dropDown .user-info {
+    padding: 0.5rem 0.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.dropDown .username {
+    margin: 0;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #ececec;
 }
 
 .dropDownItem{

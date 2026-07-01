@@ -1,6 +1,7 @@
 import express from 'express';
 import Thread from '../models/Thread.js';
 import getOpenAIAPITResponse from '../utils/openai.js';
+import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -23,9 +24,9 @@ router.post("/test",async(req,res)=>{
 });
 
 //Get all threads
-router.get("/thread",async(req,res)=>{
+router.get("/thread",authMiddleware,async(req,res)=>{
     try{
-        const threads=await Thread.find({}).sort({updatedAt:-1});
+        const threads=await Thread.find({userId:req.userId}).sort({updatedAt:-1});
         //descending order of updatedAt... most recent data on top
         res.json(threads);
     }
@@ -36,10 +37,10 @@ router.get("/thread",async(req,res)=>{
     }
 })
 
-router.get("/thread/:threadId",async(req,res)=>{
+router.get("/thread/:threadId",authMiddleware,async(req,res)=>{
     const {threadId}=req.params;
     try{
-        const thread=await Thread.findOne({threadId});
+        const thread=await Thread.findOne({threadId,userId:req.userId});
         if(thread)
         {
             res.json(thread.messages);
@@ -56,10 +57,10 @@ router.get("/thread/:threadId",async(req,res)=>{
     }
 });
 
-router.delete("/thread/:threadId",async(req,res)=>{
+router.delete("/thread/:threadId",authMiddleware,async(req,res)=>{
     const {threadId}=req.params;
     try{
-        const thread=await Thread.findOneAndDelete({threadId});
+        const thread=await Thread.findOneAndDelete({threadId,userId:req.userId});
         if(!thread)
         {
             res.status(404).send("Thread not found");
@@ -76,7 +77,7 @@ router.delete("/thread/:threadId",async(req,res)=>{
     }
 });
 
-router.post("/chat",async(req,res)=>{
+router.post("/chat",authMiddleware,async(req,res)=>{
     const {threadId,message}=req.body;
     if(!threadId || !message)
     {
@@ -84,13 +85,14 @@ router.post("/chat",async(req,res)=>{
     }
     try
     {
-        let thread=await Thread.findOneAndUpdate({threadId});
+        let thread=await Thread.findOne({threadId,userId:req.userId});
 
         if(!thread)
         {
             //create new thread
             thread=new Thread({
                 threadId,
+                userId:req.userId,
                 title:message,
                 messages:[{role:"user",content:message}],
                 // createdAt:Date.now()

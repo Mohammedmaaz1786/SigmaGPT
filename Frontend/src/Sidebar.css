@@ -65,6 +65,35 @@ button:hover{
     border-top: solid 0.25px rgba(255, 255, 255, 0.5);
 }
 
+.user-info{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.username{
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.logout-btn{
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin: 0;
+}
+
+.logout-btn:hover{
+    background: rgba(255, 255, 255, 0.2);
+}
+
 .fa-trash{
     opacity:0;
     position:absolute;

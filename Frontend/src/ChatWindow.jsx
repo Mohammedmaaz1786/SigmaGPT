@@ -6,7 +6,7 @@ import { useContext, useState,useEffect } from 'react';
 import {ScaleLoader} from 'react-spinners';
 
 function ChatWindow() {
-    const { prompt, setPrompt, reply, setReply,currthreadId,prevChats,setPrevChats,newChat,setNewChat } = useContext(MyContext);
+    const { prompt, setPrompt, reply, setReply,currthreadId,prevChats,setPrevChats,newChat,setNewChat, token, handleLogout, setShowAuthModal, user } = useContext(MyContext);
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false); 
 
@@ -16,7 +16,8 @@ function ChatWindow() {
         const options={
             method:"POST",
             headers:{
-                "Content-Type":"application/json"
+                "Content-Type":"application/json",
+                "Authorization": `Bearer ${token}`
             },
             body:JSON.stringify({
                 message:prompt,
@@ -61,16 +62,26 @@ function ChatWindow() {
         <div className="chatWindow">
             <div className="navbar">
                 <span>SigmaGPT<i className="fa-solid fa-angle-down"></i></span>
-                <div className="userIconDiv" onClick={handleProfileClick}>
-                    <span className="userIcon"><i className="fa-solid fa-user"></i></span>
-                </div>
+                {token ? (
+                    <div className="userIconDiv" onClick={handleProfileClick}>
+                        <span className="userIcon"><i className="fa-solid fa-user"></i></span>
+                    </div>
+                ) : (
+                    <div className="auth-buttons">
+                        <button className="login-btn" onClick={() => setShowAuthModal('login')}>Log in</button>
+                        <button className="signup-btn" onClick={() => setShowAuthModal('signup')}>Sign up</button>
+                    </div>
+                )}
             </div>
             {
-                isOpen &&
+                isOpen && token &&
                 <div className="dropDown">
+                    <div className="user-info">
+                        <p className="username">{user?.username}</p>
+                    </div>
                     <div className="dropDownItem"><i class="fa-solid fa-circle-up"></i> Upgrade Plan</div>
                     <div className="dropDownItem"><i class="fa-solid fa-gear"></i> Settings</div>
-                    <div className="dropDownItem"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</div>
+                    <div className="dropDownItem" onClick={handleLogout}><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</div>
                 </div>
             }
             <Chat></Chat>
@@ -78,18 +89,19 @@ function ChatWindow() {
             <ScaleLoader color="#fff" loading={loading}></ScaleLoader>
             <div className="chatInput">
                 <div className="inputBox">
-                    <input placeholder="Ask Anything..."
+                    <input placeholder={token ? "Ask Anything..." : "Log in to chat"}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
+                            if (e.key === 'Enter' && token) {
                                 getReply();
                             }
                         }
                     }
+                    disabled={!token}
                     >
                     </input>
-                    <div id="submit" onClick={getReply}>
+                    <div id="submit" onClick={token ? getReply : undefined} style={{ cursor: token ? 'pointer' : 'not-allowed', opacity: token ? 1 : 0.5 }}>
                         <i className="fa-solid fa-paper-plane"></i>
                     </div>
                 </div>
